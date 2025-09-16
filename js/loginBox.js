@@ -37,7 +37,6 @@ class GradientWaveLoginForm {
       this.togglePassword(e)
     );
 
-
     // Card wave effect
     if (this.card) {
       this.card.addEventListener("mousemove", (e) => this.updateCardWave(e));
@@ -52,11 +51,14 @@ class GradientWaveLoginForm {
 
   // ---------- Password Toggle ----------
   togglePassword(event) {
-  this.passwordInput.type = this.passwordInput.type === 'password' ? 'text' : 'password';
-  this.passwordToggle.classList.toggle('show-password', this.passwordInput.type === 'text');
-  this.createRipple(event, this.passwordToggle);
-}
-
+    this.passwordInput.type =
+      this.passwordInput.type === "password" ? "text" : "password";
+    this.passwordToggle.classList.toggle(
+      "show-password",
+      this.passwordInput.type === "text"
+    );
+    this.createRipple(event, this.passwordToggle);
+  }
 
   // ---------- Card Wave ----------
   updateCardWave(e) {
@@ -85,27 +87,27 @@ class GradientWaveLoginForm {
 
   // ---------- Ripple ----------
   createRipple(event, element, type = "default") {
-  const rect = element.getBoundingClientRect();
-  const size = Math.max(rect.width, rect.height) * (type === "gradient" ? 2 : 1);
-  const x = event.clientX - rect.left - size / 2;
-  const y = event.clientY - rect.top - size / 2;
+    const rect = element.getBoundingClientRect();
+    const size =
+      Math.max(rect.width, rect.height) * (type === "gradient" ? 2 : 1);
+    const x = event.clientX - rect.left - size / 2;
+    const y = event.clientY - rect.top - size / 2;
 
-  const ripple = document.createElement("div");
-  ripple.className = type === "gradient" ? "ripple gradient" : "ripple";
-  ripple.style.left = `${x}px`;
-  ripple.style.top = `${y}px`;
-  ripple.style.width = ripple.style.height = `${size}px`;
+    const ripple = document.createElement("div");
+    ripple.className = type === "gradient" ? "ripple gradient" : "ripple";
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    ripple.style.width = ripple.style.height = `${size}px`;
 
-  // ⚠️ Só ajusta se for 'static'
-  const currentPos = getComputedStyle(element).position;
-  if (currentPos === "static") {
-    element.style.position = "relative";
+    // ⚠️ Só ajusta se for 'static'
+    const currentPos = getComputedStyle(element).position;
+    if (currentPos === "static") {
+      element.style.position = "relative";
+    }
+
+    element.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 800);
   }
-
-  element.appendChild(ripple);
-  setTimeout(() => ripple.remove(), 800);
-}
-
 
   // ---------- Validations ----------
   validateUsername() {
@@ -150,40 +152,57 @@ class GradientWaveLoginForm {
 
   // ---------- Form Submit ----------
   async handleSubmit(e) {
-    e.preventDefault();
-    const validusername = this.validateUsername();
-    const validPassword = this.validatePassword();
-    if (!validusername || !validPassword) return;
+  e.preventDefault();
 
-    this.setLoading(true);
+  const validusername = this.validateUsername();
+  const validPassword = this.validatePassword();
+  if (!validusername || !validPassword) return;
 
-    await new Promise((r) => setTimeout(r, 2500));
-
-    const username = this.usernameInput.value.trim();
-  const password = this.passwordInput.value.trim();
+  this.setLoading(true);
 
   try {
-    const result = await FormUtils.simulateLogin(username, password);
+    const resp = await fetch("http://localhost:4000/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: this.usernameInput.value.trim(),
+        password: this.passwordInput.value.trim()
+      }),
+    });
 
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      // se o backend devolveu erro → mostrar no login
+      this.showError(data.message || "Invalid credentials");
+      return;
+    }
+
+    // guardar token no localStorage
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("username", this.usernameInput.value.trim());
+
+    // animação de sucesso
     this.showSuccessWave();
-    this.setLoading(false);
 
-    // 👉 Redireciona após sucesso
+    // redirecionar após animação
     setTimeout(() => {
-      window.location.href = "levels\\level1.html"; 
-    }, 2000);
+      window.location.href = "level1.html";
+    }, 2500);
 
   } catch (err) {
+    this.showError("Connection error. Please try again.");
+  } finally {
     this.setLoading(false);
-    this.showError("password", err.message || "Invalid credentials");
   }
-  }
+}
+
 
   // ---------- Loading ----------
   setLoading(loading) {
     this.submitButton.classList.toggle("loading", loading);
     this.submitButton.disabled = loading;
-    }
+  }
 
   // ---------- Success ----------
   showSuccessWave() {
@@ -193,13 +212,12 @@ class GradientWaveLoginForm {
 
   // ---------- Particle Animation ----------
   animateParticles() {
-  document.querySelectorAll('.particle').forEach((p) => {
-    const x = Math.random() * 10 - 5;
-    const y = Math.random() * 10 - 5;
-    p.style.transform = `translate(${x}px, ${y}px)`;
-  });
-}
-
+    document.querySelectorAll(".particle").forEach((p) => {
+      const x = Math.random() * 10 - 5;
+      const y = Math.random() * 10 - 5;
+      p.style.transform = `translate(${x}px, ${y}px)`;
+    });
+  }
 }
 
 document.addEventListener(
