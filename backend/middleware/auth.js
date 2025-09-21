@@ -1,16 +1,13 @@
+//middleware/auth.js
+
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
 export function requireAuth(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  if (!authHeader) {
-    return res.status(401).json({ message: "Missing Authorization header" });
-  }
-
-  const token = authHeader.split(" ")[1]; // "Bearer <token>"
+  const token = req.cookies.token;   // take token from cookie
   if (!token) {
-    return res.status(401).json({ message: "Missing token" });
+    return res.status(401).json({ message: "No token provided" });
   }
 
   try {
@@ -18,6 +15,6 @@ export function requireAuth(req, res, next) {
     req.user = decoded; // { id, username }
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+    return res.status(401).json({ message: "Session expired, please login again" });
   }
 }

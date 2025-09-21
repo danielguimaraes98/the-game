@@ -1,8 +1,11 @@
+//models/User.js
+
 import bcrypt from "bcrypt";
 import { db } from "../db.js";
 
 export class User {
-  // cria um novo utilizador com password encriptada
+  
+  // create new user with encripted password
   static async create(username, plainPassword) {
     const hash = await bcrypt.hash(plainPassword, 10);
     await db.run(
@@ -12,22 +15,22 @@ export class User {
     return this.findByUsername(username);
   }
 
-  // encontra um user pelo username
+  // search user by username
   static findByUsername(username) {
     return db.get("SELECT * FROM users WHERE username = ?", username);
   }
 
-  // encontra um user pelo id
+  // search user by id
   static findById(id) {
     return db.get("SELECT * FROM users WHERE id = ?", id);
   }
 
-  // valida password (compara hash)
+  // validate password (compare hash)
   static async validatePassword(user, plainPassword) {
     return bcrypt.compare(plainPassword, user.password);
   }
 
-  // lista todos os users (só para fins de admin/teste)
+  // list all users (for admin/test purposes)
   static all() {
     return db.all("SELECT id, username, created_at FROM users");
   }
