@@ -8,6 +8,7 @@ import "./db.js"; // initialize BD
 
 import { authRouter } from "./routes/auth.js";
 import { requireAuth } from "./middleware/auth.js";
+import { adminRouter } from "./routes/admin.js";
 
 // create appp first
 const app = express();
@@ -21,7 +22,7 @@ const allowedOrigins = process.env.CORS_ORIGINS
 app.use(
   cors({
     origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
 );
@@ -44,3 +45,5 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`);
 });
+
+app.use("/admin", adminRouter);

@@ -45,7 +45,7 @@ authRouter.post("/login", async (req, res) => {
 
   // Create token JWT
   const token = jwt.sign(
-    { id: user.id, username: user.username },
+    { id: user.id, username: user.username, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: process.env.TOKEN_EXPIRATION || "1h" }
   );
@@ -56,9 +56,18 @@ authRouter.post("/login", async (req, res) => {
       httpOnly: true, // não acessível por JS
       secure: true, // ⚠️ em produção precisa HTTPS
       sameSite: "Strict", // previne CSRF básico
-      maxAge: parseInt(process.env.COOKIE_MAXAGE) || 1000 * 60 * 60 // 1 hora
+      maxAge: parseInt(process.env.COOKIE_MAXAGE) || 1000 * 60 * 60, // 1 hora
     })
-    .json({ message: "Login successful" });
+    .json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        level: user.level,
+      },
+    });
 });
 
 authRouter.post("/logout", (req, res) => {

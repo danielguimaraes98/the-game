@@ -182,15 +182,20 @@ class GradientWaveLoginForm {
         return;
       }
 
-      // guardar username no localStorage
+      // guardar username e role no localStorage
       localStorage.setItem("username", this.usernameInput.value.trim());
+      localStorage.setItem("role", data.user.role);
 
       // animação de sucesso
       this.showSuccessWave();
 
       // redirecionar após animação
       setTimeout(() => {
-        window.location.href = "levels/level1.html";
+        if (data.user.role === "admin") {
+          window.location.href = "admin/admin.html";
+        } else {
+          window.location.href = "levels/level1/level1.html";
+        }
       }, 2500);
     } catch (err) {
       this.showError("username", "Connection error. Please try again.");

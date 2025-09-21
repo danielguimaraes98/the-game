@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>The Game — Admin</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">The Game</div>
+        <button
+          id="toggleSidebar"
+          class="toggle-btn"
+          aria-label="Toggle sidebar"
+        >
+          ≡
+        </button>
+      </div>
+
+      <nav>
+        <button class="active" data-section="home" data-icon="🏠">
+          <span class="label">🏠 Dashboard</span>
+        </button>
+        <button data-section="users" data-icon="👤">
+          <span class="label">👤 Users</span>
+        </button>
+        <button data-section="progress" data-icon="📈">
+          <span class="label">📈 Progress</span>
+        </button>
+        <button data-section="settings" data-icon="⚙️">
+          <span class="label">⚙️ Settings</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <div class="main">
+      <!-- Navbar / ribbon -->
+      <header class="navbar">
+        <h1>Admin Dashboard</h1>
+        <button id="logout">Logout</button>
+      </header>
+
+      <!-- Dashboard body -->
+      <main id="content" class="dashboard">
+        <h2>Welcome back, Admin</h2>
+        <p>Select a module to manage:</p>
+
+        <div class="cards">
+          <div class="card" data-section="users">
+            <div class="icon">👤</div>
+            <h3>Users</h3>
+            <p>View and manage registered users.</p>
+          </div>
+          <div class="card" data-section="progress">
+            <div class="icon">📈</div>
+            <h3>Progress</h3>
+            <p>Track level progression of users.</p>
+          </div>
+          <div class="card" data-section="settings">
+            <div class="icon">⚙️</div>
+            <h3>Settings</h3>
+            <p>Adjust configurations and options.</p>
+          </div>
+        </div>
+
+        <div id="sectionContent" style="margin-top: 20px"></div>
+      </main>
+    </div>
+
+    <!-- User Management Modal -->
+    <div id="userModal" class="modal hidden">
+      <div class="modal-content">
+        <span id="closeModal" class="close">&times;</span>
+        <h2>Manage User</h2>
+        <p id="modalUsername"></p>
+
+        <label for="modalLevel">Level:</label>
+        <input type="number" id="modalLevel" min="1" />
+
+        <label for="modalRole">Role:</label>
+        <select id="modalRole">
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+
+        <div class="modal-actions">
+          <button id="btnSaveChanges" class="primary">Save Changes</button>
+          <button id="btnReset" class="warning">Reset Level</button>
+          <button id="btnDelete" class="danger">Delete User</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="admin.js"></script>
+  </body>
+</html>
