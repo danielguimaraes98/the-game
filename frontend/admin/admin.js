@@ -2,6 +2,9 @@
 // Admin Dashboard Logic
 // ==============================
 
+// Import the AuthGuard to validate that the user is logged in and is an admin
+import { requireAuth } from "../js/authGuard.js";
+
 // Base URL of the backend API
 const API = "http://127.0.0.1:4000";
 
@@ -16,7 +19,10 @@ async function loadUsers() {
     <h2>Users</h2>
     <div class="toolbar">
       <input id="newUsername" placeholder="username" />
-      <input id="newPassword" placeholder="password" type="password" />
+      <div class="password-wrapper">
+        <input id="newPassword" placeholder="password" type="password" />
+        <button type="button" id="togglePassword" class="toggle-password">👁️</button>
+      </div>
       <select id="newRole">
         <option value="user" selected>User</option>
         <option value="admin">Admin</option>
@@ -27,7 +33,15 @@ async function loadUsers() {
   `;
 
   // Register "create user" button
-  document.getElementById("btnCreateUser").addEventListener("click", createUser);
+  document
+    .getElementById("btnCreateUser")
+    .addEventListener("click", createUser);
+
+  // ✅ Add toggle password handler here
+  document.getElementById("togglePassword").addEventListener("click", () => {
+    const input = document.getElementById("newPassword");
+    input.type = input.type === "password" ? "text" : "password";
+  });
 
   await refreshUsersTable();
 }
@@ -40,14 +54,16 @@ async function refreshUsersTable() {
     if (!resp.ok) throw new Error("Failed to fetch users");
     const users = await resp.json();
 
-    // Render table rows
+    // Render table rows dynamically
     container.innerHTML = `
       <table class="users-table">
         <thead>
           <tr><th>ID</th><th>Username</th><th>Role</th><th>Level</th><th>Actions</th></tr>
         </thead>
         <tbody>
-          ${users.map((u) => `
+          ${users
+            .map(
+              (u) => `
             <tr>
               <td>${u.id}</td>
               <td>${u.username}</td>
@@ -55,12 +71,16 @@ async function refreshUsersTable() {
               <td>${u.level ?? 1}</td>
               <td>
                 <button class="action-btn" 
-                  onclick="openUserModal(${u.id}, '${u.username}', '${u.role || "user"}', ${u.level ?? 1})">
+                  onclick="openUserModal(${u.id}, '${u.username}', '${
+                u.role || "user"
+              }', ${u.level ?? 1})">
                   Manage
                 </button>
               </td>
             </tr>
-          `).join("")}
+          `
+            )
+            .join("")}
         </tbody>
       </table>
     `;
@@ -89,25 +109,27 @@ document.getElementById("closeModal").addEventListener("click", () => {
 });
 
 // Save changes (role / level)
-document.getElementById("btnSaveChanges").addEventListener("click", async () => {
-  const newLevel = parseInt(document.getElementById("modalLevel").value, 10);
-  const newRole = document.getElementById("modalRole").value;
+document
+  .getElementById("btnSaveChanges")
+  .addEventListener("click", async () => {
+    const newLevel = parseInt(document.getElementById("modalLevel").value, 10);
+    const newRole = document.getElementById("modalRole").value;
 
-  const resp = await fetch(`${API}/admin/users/${currentUserId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ level: newLevel, role: newRole }),
+    const resp = await fetch(`${API}/admin/users/${currentUserId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ level: newLevel, role: newRole }),
+    });
+
+    if (resp.ok) {
+      alert("Changes saved");
+      document.getElementById("userModal").classList.add("hidden");
+      await refreshUsersTable();
+    } else {
+      alert("Failed to save changes");
+    }
   });
-
-  if (resp.ok) {
-    alert("Changes saved");
-    document.getElementById("userModal").classList.add("hidden");
-    await refreshUsersTable();
-  } else {
-    alert("Failed to save changes");
-  }
-});
 
 // Reset user level
 document.getElementById("btnReset").addEventListener("click", async () => {
@@ -165,9 +187,16 @@ async function createUser() {
 }
 
 // ------------------------------
-// Sidebar & Navigation
+// Sidebar, Navigation & Logout
 // ------------------------------
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // ✅ Protect the dashboard: check if user is logged in and is admin
+  const user = await requireAuth();
+  if (!user || user.role !== "admin") {
+    window.location.href = "/"; // redirect to login if not authorized
+    return;
+  }
+
   const sidebar = document.querySelector(".sidebar");
   const toggleBtn = document.getElementById("toggleSidebar");
   const navButtons = document.querySelectorAll(".sidebar nav button");
@@ -203,7 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Logout
+  // Logout button
   document.getElementById("logout").addEventListener("click", () => {
     fetch(`${API}/auth/logout`, {
       method: "POST",

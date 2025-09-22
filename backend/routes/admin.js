@@ -1,16 +1,38 @@
 // backend/routes/admin.js
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import { User } from "../models/User.js";
 
 export const adminRouter = express.Router();
 
-// All routes below require authentication + admin role
+// Resolve __dirname (para usar sendFile)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * GET /admin
+ * → Serve o painel HTML (check role inline)
+ */
+adminRouter.get("/", requireAuth, async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).send("🚫 Only admins allowed");
+  }
+
+  const filePath = path.join(__dirname, "..", "..", "frontend", "admin", "admin.html");
+  res.set("Cache-Control", "no-store");
+  res.sendFile(filePath);
+});
+
+// ---------------- API ----------------
+
+// Todas as rotas abaixo requerem autenticação + role admin
 adminRouter.use(requireAuth, requireAdmin);
 
 /**
  * GET /admin/users
- * → List all users with detailed info (for admin dashboard)
+ * → List all users with detailed info
  */
 adminRouter.get("/users", async (_req, res) => {
   const users = await User.allDetailed();
@@ -34,12 +56,14 @@ adminRouter.post("/users", async (req, res) => {
       id: u.id,
       username: u.username,
       role: u.role,
-      level: u.level
+      level: u.level,
     });
-  } catch {
-    res.status(400).json({ message: "Username already exists" });
+  } catch (err) {
+    // forward the exact error message from User.js
+    res.status(400).json({ message: err.message || "Failed to create user" });
   }
 });
+
 
 /**
  * DELETE /admin/users/:id

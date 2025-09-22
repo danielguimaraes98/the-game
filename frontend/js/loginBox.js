@@ -192,9 +192,11 @@ class GradientWaveLoginForm {
       // redirecionar após animação
       setTimeout(() => {
         if (data.user.role === "admin") {
-          window.location.href = "admin/admin.html";
+          window.location.href = "/admin"; // já tens rota protegida no server
         } else {
-          window.location.href = "levels/level1/level1.html";
+          // respeita o nível do user guardado na DB
+          const lvl = data.user.level || 1;
+          window.location.href = `/levels/${lvl}`;
         }
       }, 2500);
     } catch (err) {

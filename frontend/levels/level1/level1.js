@@ -1,30 +1,55 @@
+import { requireAuth } from "../../js/authGuard.js";
+
 const chat = document.getElementById("chat");
 
 const messages = [
-  { text: "Olá! Os presets que tens são para o lightroom no telemóvel ou no pc? 😅", side: "right" },
+  {
+    text: "Olá! Os presets que tens são para o lightroom no telemóvel ou no pc? 😅",
+    side: "right",
+  },
   { text: "Olá", side: "left" },
   { text: "São no telemóvel", side: "left" },
   { text: "Eu só uso no telemóvel no computador não sei ahaha", side: "left" },
-  { text: "Mas um preset tanto da para usar no pc ou telemóvel é exatamente igual!", side: "left" },
-  { text: "Sim, eu costumo editar no pc xb Tenho a aplicação no telemóvel mas não tenho lá grandes presets 😅", side: "right" },
-  { text: "Sabes que presets tanto faz no computador ou telemóvel, eu acho que quem percebe de edição no computador fica melhor mas para mim telemóvel é mais pratico", side: "left" },
+  {
+    text: "Mas um preset tanto da para usar no pc ou telemóvel é exatamente igual!",
+    side: "left",
+  },
+  {
+    text: "Sim, eu costumo editar no pc xb Tenho a aplicação no telemóvel mas não tenho lá grandes presets 😅",
+    side: "right",
+  },
+  {
+    text: "Sabes que presets tanto faz no computador ou telemóvel, eu acho que quem percebe de edição no computador fica melhor mas para mim telemóvel é mais pratico",
+    side: "left",
+  },
   { text: "Eu posso te dar alguns presets se quiseres", side: "left" },
-  { text: "Não quero estar a dar trabalho, mas de qualquer das maneiras obrigado mesmo!!", side: "right" },
+  {
+    text: "Não quero estar a dar trabalho, mas de qualquer das maneiras obrigado mesmo!!",
+    side: "right",
+  },
   { text: "Eu posso dar te é mesmo chill xd", side: "left" },
   { text: "Nao custa nada mas se n queres okey", side: "left" },
   { text: "Sendo assim se não der grande trabalho agradeço 😅", side: "right" },
   { text: "Ahahhaha", side: "left" },
   { text: "Sabia que estavas a ser modesto", side: "left" },
   { text: "Escusas de ter vergonha, claro que dou", side: "left" },
-  { text: "Well, tenho mesmo muitos, vou te mostrar alguns e escolhes okey?", side: "left" },
-  { text: "A sério, se der muito trabalho deixa estar!! Estou a falar mesmo a sério 🙊", side: "right" },
+  {
+    text: "Well, tenho mesmo muitos, vou te mostrar alguns e escolhes okey?",
+    side: "left",
+  },
+  {
+    text: "A sério, se der muito trabalho deixa estar!! Estou a falar mesmo a sério 🙊",
+    side: "right",
+  },
   { text: "Não dá trabalho nenhum rapaz", side: "left" },
-  { text: "Apenas teras que perder um pouco do teu tempo a falar cmg a escolher presets", side: "left" },
+  {
+    text: "Apenas teras que perder um pouco do teu tempo a falar cmg a escolher presets",
+    side: "left",
+  },
   { text: "😂", side: "left" },
   { text: "Obrigado então, bora lá 😂", side: "right" },
 ];
 
-const correctCode = "2019"; // código do ano
 let i = 0;
 
 // som da mensagem
@@ -81,22 +106,44 @@ function showMessage() {
         <button id="submit-code">Submit</button>
         <p id="error-msg" class="error hidden"></p>
       `;
-      chat.appendChild(codeDiv);   // ✅ append (fundo), não prepend
+      chat.appendChild(codeDiv);
       scrollToBottom();
 
-      document.getElementById("submit-code").addEventListener("click", () => {
-        const inputCode = document.getElementById("code").value.trim();
-        if (inputCode === correctCode) {
-          window.location.href = "../level2/level2.html";
-        } else {
-          const errorMsg = document.getElementById("error-msg");
-          errorMsg.textContent = "Wrong code. Try again.";
-          errorMsg.classList.remove("hidden");
-        }
-      });
+      document
+        .getElementById("submit-code")
+        .addEventListener("click", async () => {
+          const inputCode = document.getElementById("code").value.trim();
+
+          try {
+            const res = await fetch("http://127.0.0.1:4000/levels/1/submit", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ code: inputCode }),
+            });
+
+            const data = await res.json();
+            if (res.ok && data.ok) {
+              window.location.href = `../level${data.next}/level${data.next}.html`;
+            } else {
+              const errorMsg = document.getElementById("error-msg");
+              errorMsg.textContent = data.message || "Wrong code. Try again.";
+              errorMsg.classList.remove("hidden");
+            }
+          } catch (err) {
+            console.error(err);
+            const errorMsg = document.getElementById("error-msg");
+            errorMsg.textContent = "⚠️ Error connecting to server.";
+            errorMsg.classList.remove("hidden");
+          }
+        });
     }, 1500);
   }
 }
 
-// arranca
-setTimeout(showMessage, 600);
+// ✅ arranque protegido por requireAuth
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await requireAuth(1); // garante que está autenticado e no nível certo
+  if (!user) return; // se não estiver autenticado → redireciona para login
+  setTimeout(showMessage, 600); // arranca só se autenticado
+});

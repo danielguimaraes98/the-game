@@ -7,13 +7,35 @@ export class User {
    * Create a new user with encrypted password
    * Default: role = "user", level = 1
    */
-  static async create(username, plainPassword, role = "user", level = 1) {
-    const hash = await bcrypt.hash(plainPassword, 10);
-    await db.run(
-      "INSERT INTO users (username, password, role, level) VALUES (?, ?, ?, ?)",
-      [username, hash, role, level]
-    );
-    return this.findByUsername(username);
+  static async create(username, password, role = "user") {
+    // --- Validation (same rules as frontend) ---
+    if (!password) {
+      throw new Error("Password is required");
+    }
+    if (password.length < 6) {
+      throw new Error("Password must be at least 6 characters long");
+    }
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      throw new Error("Password must contain uppercase, lowercase, and number");
+    }
+
+    // --- Username required ---
+    if (!username) {
+      throw new Error("Username is required");
+    }
+
+    // --- Hash + store ---
+    const hashed = await bcrypt.hash(password, 10);
+    try {
+      const stmt = await db.run(
+        "INSERT INTO users (username, password, role, level) VALUES (?, ?, ?, 1)",
+        [username, hashed, role]
+      );
+      return { id: stmt.lastID, username, role, level: 1 };
+    } catch (err) {
+      // sqlite UNIQUE constraint on username → já existe
+      throw new Error("Username already exists");
+    }
   }
 
   /** Find user by username */

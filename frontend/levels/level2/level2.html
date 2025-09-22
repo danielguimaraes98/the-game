@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>Hello from level 2 😊"</h3>
+
+    <!-- AuthGuard -->
+  <script type="module">
+    import { requireAuth } from "../../js/authGuard.js"; 
+    // ↑ Caminho ajustado: este ficheiro está em levels/level1/, por isso tem de subir 2 níveis até /frontend/js/
+
+    requireAuth(1); // validate access to Level 1
+  </script>
+</body>
+</html>

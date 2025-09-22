@@ -231,6 +231,31 @@ body {
 
 
 
+.password-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.password-wrapper input {
+  padding-right: 2.5rem; /* espaço para o botão */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: white; 
+  z-index: 10;
+}
+
+
+
+
 /* Modal para editar user */
 
 .modal {
