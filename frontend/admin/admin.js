@@ -2,11 +2,34 @@
 // Admin Dashboard Logic
 // ==============================
 
-// Import the AuthGuard to validate that the user is logged in and is an admin
 import { requireAuth } from "../js/authGuard.js";
 
-// Base URL of the backend API
 const API = "http://127.0.0.1:4000";
+
+// ------------------------------
+// Helpers for feedback messages
+// ------------------------------
+function showModalFeedback(message, type = "success") {
+  const el = document.getElementById("modalFeedback");
+  el.textContent = message;
+  el.className = `feedback ${type}`;
+  el.classList.remove("hidden");
+  setTimeout(() => {
+    el.classList.add("hidden");
+    el.textContent = "";
+  }, 3000); // auto-hide after 3s
+}
+
+function showLevelFeedback(message, type = "success") {
+  const el = document.getElementById("levelFeedback");
+  el.textContent = message;
+  el.className = `feedback ${type}`;
+  el.classList.remove("hidden");
+  setTimeout(() => {
+    el.classList.add("hidden");
+    el.textContent = "";
+  }, 3000); // auto-hide after 3s
+}
 
 // ------------------------------
 // Load & Display Users Section
@@ -14,7 +37,6 @@ const API = "http://127.0.0.1:4000";
 async function loadUsers() {
   const wrap = document.getElementById("sectionContent");
 
-  // Render section header and "add user" toolbar
   wrap.innerHTML = `
     <h2>Users</h2>
     <div class="toolbar">
@@ -32,12 +54,9 @@ async function loadUsers() {
     <div id="usersTable">Loading...</div>
   `;
 
-  // Register "create user" button
-  document
-    .getElementById("btnCreateUser")
-    .addEventListener("click", createUser);
+  document.getElementById("btnCreateUser").addEventListener("click", createUser);
 
-  // ✅ Add toggle password handler here
+  // Toggle password visibility
   document.getElementById("togglePassword").addEventListener("click", () => {
     const input = document.getElementById("newPassword");
     input.type = input.type === "password" ? "text" : "password";
@@ -46,7 +65,6 @@ async function loadUsers() {
   await refreshUsersTable();
 }
 
-// Fetch and render the users table
 async function refreshUsersTable() {
   const container = document.getElementById("usersTable");
   try {
@@ -54,7 +72,6 @@ async function refreshUsersTable() {
     if (!resp.ok) throw new Error("Failed to fetch users");
     const users = await resp.json();
 
-    // Render table rows dynamically
     container.innerHTML = `
       <table class="users-table">
         <thead>
@@ -71,9 +88,7 @@ async function refreshUsersTable() {
               <td>${u.level ?? 1}</td>
               <td>
                 <button class="action-btn" 
-                  onclick="openUserModal(${u.id}, '${u.username}', '${
-                u.role || "user"
-              }', ${u.level ?? 1})">
+                  onclick="openUserModal(${u.id}, '${u.username}', '${u.role || "user"}', ${u.level ?? 1})">
                   Manage
                 </button>
               </td>
@@ -94,62 +109,64 @@ async function refreshUsersTable() {
 // ------------------------------
 let currentUserId = null;
 
-// Open modal with user data
 window.openUserModal = function (id, username, role, level) {
   currentUserId = id;
   document.getElementById("modalUsername").textContent = `User: ${username}`;
   document.getElementById("modalRole").value = role || "user";
   document.getElementById("modalLevel").value = level || 1;
+  document.getElementById("modalFeedback").classList.add("hidden"); // clear old feedback
   document.getElementById("userModal").classList.remove("hidden");
 };
 
-// Close modal
 document.getElementById("closeModal").addEventListener("click", () => {
   document.getElementById("userModal").classList.add("hidden");
+  document.getElementById("modalFeedback").classList.add("hidden"); // clear feedback
+  document.getElementById("modalFeedback").textContent = ""; // clear text
 });
 
-// Save changes (role / level)
-document
-  .getElementById("btnSaveChanges")
-  .addEventListener("click", async () => {
-    const newLevel = parseInt(document.getElementById("modalLevel").value, 10);
-    const newRole = document.getElementById("modalRole").value;
+// ✅ close modal when clicking outside the box
+document.getElementById("userModal").addEventListener("click", (e) => {
+  if (e.target.id === "userModal") {
+    e.currentTarget.classList.add("hidden");
+  }
+});
 
-    const resp = await fetch(`${API}/admin/users/${currentUserId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ level: newLevel, role: newRole }),
-    });
+document.getElementById("btnSaveChanges").addEventListener("click", async () => {
+  const newLevel = parseInt(document.getElementById("modalLevel").value, 10);
+  const newRole = document.getElementById("modalRole").value;
 
-    if (resp.ok) {
-      alert("Changes saved");
-      document.getElementById("userModal").classList.add("hidden");
-      await refreshUsersTable();
-    } else {
-      alert("Failed to save changes");
-    }
+  const resp = await fetch(`${API}/admin/users/${currentUserId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ level: newLevel, role: newRole }),
   });
 
-// Reset user level
+  if (resp.ok) {
+    showModalFeedback("Changes saved ✅", "success");
+    await refreshUsersTable();
+  } else {
+    showModalFeedback("Failed to save changes ❌", "error");
+  }
+});
+
 document.getElementById("btnReset").addEventListener("click", async () => {
   if (!confirm("Reset this user’s level?")) return;
   await fetch(`${API}/admin/users/${currentUserId}/reset`, {
     method: "PATCH",
     credentials: "include",
   });
-  document.getElementById("userModal").classList.add("hidden");
+  showModalFeedback("User reset to level 1 ✅", "success");
   await refreshUsersTable();
 });
 
-// Delete user
 document.getElementById("btnDelete").addEventListener("click", async () => {
   if (!confirm("Delete this user?")) return;
   await fetch(`${API}/admin/users/${currentUserId}`, {
     method: "DELETE",
     credentials: "include",
   });
-  document.getElementById("userModal").classList.add("hidden");
+  showModalFeedback("User deleted ✅", "success");
   await refreshUsersTable();
 });
 
@@ -179,7 +196,6 @@ async function createUser() {
     return;
   }
 
-  // Clear inputs and refresh table
   document.getElementById("newUsername").value = "";
   document.getElementById("newPassword").value = "";
   document.getElementById("newRole").value = "user";
@@ -187,13 +203,102 @@ async function createUser() {
 }
 
 // ------------------------------
+// Levels Section
+// ------------------------------
+async function loadLevels() {
+  const wrap = document.getElementById("sectionContent");
+  wrap.innerHTML = `<h2>Levels</h2><div id="levelsTable">Loading...</div>`;
+  await refreshLevelsTable();
+}
+
+async function refreshLevelsTable() {
+  const container = document.getElementById("levelsTable");
+  try {
+    const resp = await fetch(`${API}/admin/levels`, { credentials: "include" });
+    if (!resp.ok) throw new Error("Failed to fetch levels");
+    const levels = await resp.json();
+
+    container.innerHTML = `
+      <table class="users-table">
+        <thead>
+          <tr><th>Level</th><th>Code</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          ${levels
+            .map(
+              (lvl) => `
+            <tr>
+              <td>${lvl.level}</td>
+              <td>${lvl.code}</td>
+              <td>
+                <button class="action-btn" onclick="openLevelModal(${lvl.level}, '${lvl.code}')">
+                  Manage
+                </button>
+              </td>
+            </tr>
+          `
+            )
+            .join("")}
+        </tbody>
+      </table>
+    `;
+  } catch (e) {
+    container.innerHTML = `<p style="color:#f66">${e.message}</p>`;
+  }
+}
+
+let currentLevelId = null;
+
+window.openLevelModal = function (level, code) {
+  currentLevelId = level;
+  document.getElementById("modalLevelTitle").textContent = `Level ${level}`;
+  document.getElementById("modalCode").value = code || "";
+  document.getElementById("levelFeedback").classList.add("hidden");
+  document.getElementById("levelModal").classList.remove("hidden");
+};
+
+document.getElementById("closeLevelModal").addEventListener("click", () => {
+  document.getElementById("levelModal").classList.add("hidden");
+  document.getElementById("levelFeedback").classList.add("hidden"); // clear feedback
+  document.getElementById("levelFeedback").textContent = ""; // clear text
+});
+
+// ✅ close level modal when clicking outside
+document.getElementById("levelModal").addEventListener("click", (e) => {
+  if (e.target.id === "levelModal") {
+    e.currentTarget.classList.add("hidden");
+  }
+});
+
+document.getElementById("btnSaveLevel").addEventListener("click", async () => {
+  const newCode = document.getElementById("modalCode").value.trim();
+  if (!newCode) {
+    showLevelFeedback("Code cannot be empty ❌", "error");
+    return;
+  }
+
+  const resp = await fetch(`${API}/admin/levels/${currentLevelId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ code: newCode }),
+  });
+
+  if (resp.ok) {
+    showLevelFeedback("Level updated ✅", "success");
+    await refreshLevelsTable();
+  } else {
+    showLevelFeedback("Failed to update level ❌", "error");
+  }
+});
+
+// ------------------------------
 // Sidebar, Navigation & Logout
 // ------------------------------
 document.addEventListener("DOMContentLoaded", async () => {
-  // ✅ Protect the dashboard: check if user is logged in and is admin
   const user = await requireAuth();
   if (!user || user.role !== "admin") {
-    window.location.href = "/"; // redirect to login if not authorized
+    window.location.href = "/";
     return;
   }
 
@@ -202,37 +307,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   const navButtons = document.querySelectorAll(".sidebar nav button");
   const cards = document.querySelectorAll(".card");
 
-  // Toggle sidebar collapse
   toggleBtn.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");
   });
 
-  // Navigation via sidebar buttons
   navButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       navButtons.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
 
-      if (btn.dataset.section === "users") {
-        loadUsers();
-      } else {
-        document.getElementById("sectionContent").innerHTML = "";
-      }
+      if (btn.dataset.section === "users") loadUsers();
+      else if (btn.dataset.section === "levels") loadLevels();
+      else document.getElementById("sectionContent").innerHTML = "";
     });
   });
 
-  // Navigation via cards
   cards.forEach((card) => {
     card.addEventListener("click", () => {
-      if (card.dataset.section === "users") {
-        loadUsers();
-      } else {
-        document.getElementById("sectionContent").innerHTML = "";
-      }
+      if (card.dataset.section === "users") loadUsers();
+      else if (card.dataset.section === "levels") loadLevels();
+      else document.getElementById("sectionContent").innerHTML = "";
     });
   });
 
-  // Logout button
   document.getElementById("logout").addEventListener("click", () => {
     fetch(`${API}/auth/logout`, {
       method: "POST",

@@ -2,9 +2,7 @@
 
 import express from "express";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-dotenv.config();
-
+import { config } from "../config.js";
 import { User } from "../models/User.js";
 
 export const authRouter = express.Router();
@@ -46,7 +44,7 @@ authRouter.post("/login", async (req, res) => {
   // Create token JWT
   const token = jwt.sign(
     { id: user.id, username: user.username, role: user.role },
-    process.env.JWT_SECRET,
+    config.jwtSecret,
     { expiresIn: process.env.TOKEN_EXPIRATION || "1h" }
   );
 

@@ -6,8 +6,16 @@
   <link rel="stylesheet" href="/levels/level1/level1.css" />
 </head>
 <body>
-  <div class="chat-container" id="chat"></div>
+   <!-- Initial Overlay -->
+  <div id="intro-overlay" class="overlay hidden">
+    <div class="overlay-content">
+      <p id="intro-text">what if none of this was real?</p>
+      <!--<button id="intro-btn">Continue?</button>-->
+      <p id="startBtn" class="fake-button">continue</p>
+    </div>
+  </div>
 
+  <div class="chat-container hidden" id="chat"></div>
 
   <!-- Level-specific JS -->
   <script type="module" src="/levels/level1/level1.js"></script>

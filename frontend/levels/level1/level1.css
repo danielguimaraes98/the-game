@@ -9,6 +9,90 @@ body {
   margin: 0;
 }
 
+
+/* Overlay inicial */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #fff;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.2rem;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 4s ease; /* fade mais lento */
+}
+
+.overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.overlay-content {
+  opacity: 0;
+  animation: fadeInSlow 7s ease-in-out forwards; /* fade-in suave */
+  font-family: "Georgia", "Times New Roman", serif; /* fonte mais elegante */
+  font-style: italic; /* deixa em itálico */
+  font-size: 1rem;  /* ligeiramente maior */
+  letter-spacing: 0.7px;
+}
+
+#intro-btn {
+  margin-top: 25px;
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.4s, color 0.4s;
+}
+
+#intro-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+@keyframes fadeInSlow {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+
+.fake-button {
+  margin-top: 20px;
+  font-family: "Georgia", serif;
+  font-size: 1rem;
+  text-transform: lowercase;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.4s ease;
+  opacity: 0.4;
+}
+
+.fake-button:hover {
+  color: #fff;
+  text-shadow: 0 0 5px rgba(255,255,255,0.6);
+}
+
+.fade-out {
+  animation: fadeOut 2s ease forwards;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+
+
+/* Messages chat*/
 .chat-container {
   width: 95%;
   max-width: 800px;
@@ -21,6 +105,14 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   overflow-y: auto;
+}
+
+.chat-date {
+  text-align: center;
+  color: #888;
+  font-size: 0.8rem;
+  margin: 10px 0;
+  font-family: "Arial", sans-serif;
 }
 
 .bubble {
@@ -100,6 +192,7 @@ body {
 
 #code-input input::placeholder {
   color: #aaa;
+  opacity: 0.4;
 }
 
 #code-input button {

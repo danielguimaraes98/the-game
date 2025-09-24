@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>The Game — Admin</title>
-    <link rel="stylesheet" href="/admin/admin.css">
+    <link rel="stylesheet" href="/admin/admin.css" />
   </head>
   <body>
     <!-- Sidebar -->
@@ -28,6 +28,9 @@
         </button>
         <button data-section="progress" data-icon="📈">
           <span class="label">📈 Progress</span>
+        </button>
+        <button data-section="levels" data-icon="🎯">
+          <span class="label">🎯 Levels</span>
         </button>
         <button data-section="settings" data-icon="⚙️">
           <span class="label">⚙️ Settings</span>
@@ -59,6 +62,12 @@
             <h3>Progress</h3>
             <p>Track level progression of users.</p>
           </div>
+          <div class="card" data-section="levels">
+            <div class="icon">🎯</div>
+            <h3>Levels</h3>
+            <p>View and manage levels.</p>
+          </div>
+
           <div class="card" data-section="settings">
             <div class="icon">⚙️</div>
             <h3>Settings</h3>
@@ -67,33 +76,54 @@
         </div>
 
         <div id="sectionContent" style="margin-top: 20px"></div>
-        
       </main>
     </div>
 
     <!-- User Management Modal -->
-    <div id="userModal" class="modal hidden">
-      <div class="modal-content">
-        <span id="closeModal" class="close">&times;</span>
-        <h2>Manage User</h2>
-        <p id="modalUsername"></p>
+<div id="userModal" class="modal hidden">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h2>Manage User</h2>
+    <p id="modalUsername"></p>
 
-        <label for="modalLevel">Level:</label>
-        <input type="number" id="modalLevel" min="1" />
+    <label for="modalLevel">Level:</label>
+    <input type="number" id="modalLevel" min="1" />
 
-        <label for="modalRole">Role:</label>
-        <select id="modalRole">
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
+    <label for="modalRole">Role:</label>
+    <select id="modalRole">
+      <option value="user">User</option>
+      <option value="admin">Admin</option>
+    </select>
 
-        <div class="modal-actions">
-          <button id="btnSaveChanges" class="primary">Save Changes</button>
-          <button id="btnReset" class="warning">Reset Level</button>
-          <button id="btnDelete" class="danger">Delete User</button>
-        </div>
-      </div>
+    <!-- ✅ Feedback message for User Modal -->
+    <p id="modalFeedback" class="feedback hidden"></p>
+
+    <div class="modal-actions">
+      <button id="btnSaveChanges" class="primary">Save Changes</button>
+      <button id="btnReset" class="warning">Reset Level</button>
+      <button id="btnDelete" class="danger">Delete User</button>
     </div>
+  </div>
+</div>
+
+<!-- Level Modal -->
+<div id="levelModal" class="modal hidden">
+  <div class="modal-content">
+    <span id="closeLevelModal" class="close">&times;</span>
+    <h3 id="modalLevelTitle">Level</h3>
+
+    <label for="modalCode">Code</label>
+    <input type="text" id="modalCode" />
+
+    <!-- ✅ Feedback message for Level Modal -->
+    <p id="levelFeedback" class="feedback hidden"></p>
+
+    <div class="modal-actions">
+      <button id="btnSaveLevel" class="primary">Save</button>
+    </div>
+  </div>
+</div>
+
 
     <script type="module" src="/admin/admin.js"></script>
   </body>

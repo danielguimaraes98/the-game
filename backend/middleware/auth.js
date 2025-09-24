@@ -1,23 +1,44 @@
 // backend/middleware/auth.js
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-dotenv.config();
+import { User } from "../models/User.js";
+import { config } from "../config.js";
 
-export function requireAuth(req, res, next) {
-  const token = req.cookies?.token;
-  if (!token) return res.status(401).json({ message: "No token provided" });
+/**
+ * Middleware: ensure a valid JWT token is provided.
+ * - Extracts token from cookies
+ * - Verifies token
+ * - Attaches user payload to req.user
+ */
+export async function requireAuth(req, res, next) {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // { id, username, role }
+    const token = req.cookies?.token;
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    const decoded = jwt.verify(token, config.jwtSecret);
+
+    const user = await User.findById(decoded.id);
+    
+    if (!user) {
+      return res.status(401).json({ message: "Invalid user" });
+    }
+
+    req.user = user;
     next();
-  } catch {
-    return res.status(401).json({ message: "Session expired, please login again" });
+  } catch (err) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
 }
 
+/**
+ * Middleware: ensure the user is an admin.
+ * Must be used after requireAuth.
+ */
 export function requireAdmin(req, res, next) {
   if (req.user?.role !== "admin") {
-    return res.status(403).json({ message: "Forbidden" });
+    return res.status(403).json({ message: "Forbidden: admin access required" });
   }
   next();
 }
+

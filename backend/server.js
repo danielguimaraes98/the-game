@@ -1,7 +1,6 @@
 // backend/server.js
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
@@ -11,20 +10,19 @@ import { authRouter } from "./routes/auth.js";
 import { meRouter } from "./routes/me.js";
 import { levelsRouter } from "./routes/levels.js";
 import { adminRouter } from "./routes/admin.js";
-
-dotenv.config();
-
-const app = express();
+import { config } from "./config.js";
 
 // Resolve __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const app = express();
+
 // Middleware
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.CORS_ORIGINS?.split(",") || ["http://127.0.0.1:3000"],
+    origin: config.corsOrigins,
     credentials: true,
   })
 );
@@ -35,7 +33,7 @@ app.get("/health", (_req, res) => res.json({ ok: true }));
 app.use("/auth", authRouter);
 app.use("/me", meRouter);
 app.use("/levels", levelsRouter);
-app.use("/admin", adminRouter); // 👈 API clara em /admin/api
+app.use("/admin", adminRouter);
 
 // ---------------- FRONTEND ROUTES ----------------
 app.use(
@@ -49,7 +47,6 @@ app.use(
 // Página admin (HTML) – protegida dentro do adminRouter em vez de aqui
 
 // ---------------- SERVER START ----------------
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`API + Frontend running on http://localhost:${PORT}`);
+app.listen(config.port, () => {
+  console.log(`API + Frontend running on http://localhost:${config.port}`);
 });

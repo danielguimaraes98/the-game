@@ -53,12 +53,17 @@ const messages = [
 let i = 0;
 
 // som da mensagem
-const messageSound = new Audio("../assets/sounds/message.mp3");
-function playMessageSound() {
-  try {
-    messageSound.currentTime = 0;
-    messageSound.play();
-  } catch (_) {}
+function playMessageSound(side) {
+  let soundFile;
+  if (side === "left") {
+    soundFile = "/media/messageReceive.mp3"; // mensagem recebida
+  } else {
+    soundFile = "/media/messageSend.mp3"; // mensagem enviada
+  }
+
+  const audio = new Audio(soundFile);
+  audio.volume = 0.5; // não ser muito alto
+  audio.play().catch((err) => console.warn("Sound play blocked:", err));
 }
 
 function scrollToBottom() {
@@ -79,31 +84,54 @@ function showMessage() {
         <span class="dot"></span>
       </div>
     `;
+
     chat.appendChild(typing);
     scrollToBottom();
+    if (msg.side === "right") {
+      playMessageSound(msg.side);
+    }
 
-    // 2) Substitui por mensagem real
+    // 2) Calcula tempo de typing proporcional ao tamanho da mensagem
+    const baseTyping = msg.text.length * 50; // 50ms por caracter
+    const typingTime = Math.min(2000, baseTyping + Math.random() * 500);
+    // nunca passa de 2s
+
+    // tempo entre mensagens também com variação
+    const delay = 800 + Math.random() * 1200; // 0.8s–2s
+
     setTimeout(() => {
       typing.remove();
+
+      if (i === 0) {
+        const dateDiv = document.createElement("div");
+        dateDiv.className = "chat-date";
+
+        // Data atual formatada (ex: "24 September 2025")
+        dateDiv.textContent = "21/08/2019";
+
+        chat.appendChild(dateDiv);
+      }
 
       const bubble = document.createElement("div");
       bubble.className = `bubble ${msg.side}`;
       bubble.textContent = msg.text;
       chat.appendChild(bubble);
       scrollToBottom();
-      playMessageSound();
+      if (msg.side === "left") {
+        playMessageSound(msg.side);
+      }
 
       i++;
-      setTimeout(showMessage, 2500);
-    }, 2000);
+      setTimeout(showMessage, delay);
+    }, typingTime);
   } else {
     // 3) No fim, mostra o input — também no fundo
     setTimeout(() => {
       const codeDiv = document.createElement("div");
       codeDiv.id = "code-input";
       codeDiv.innerHTML = `
-        <input type="text" id="code" placeholder="Enter the code..." />
-        <button id="submit-code">Submit</button>
+        <input type="text" id="code" placeholder="Back to the year it all started..." />
+        <button id="submit-code">Unlock</button>
         <p id="error-msg" class="error hidden"></p>
       `;
       chat.appendChild(codeDiv);
@@ -127,7 +155,7 @@ function showMessage() {
               window.location.href = `../level${data.next}/level${data.next}.html`;
             } else {
               const errorMsg = document.getElementById("error-msg");
-              errorMsg.textContent = data.message || "Wrong code. Try again.";
+              errorMsg.textContent = "Not the beginning I remember.";
               errorMsg.classList.remove("hidden");
             }
           } catch (err) {
@@ -143,7 +171,43 @@ function showMessage() {
 
 // ✅ arranque protegido por requireAuth
 document.addEventListener("DOMContentLoaded", async () => {
-  const user = await requireAuth(1); // garante que está autenticado e no nível certo
-  if (!user) return; // se não estiver autenticado → redireciona para login
-  setTimeout(showMessage, 600); // arranca só se autenticado
+  const user = await requireAuth(1);
+  if (!user) return;
+
+  const overlay = document.getElementById("intro-overlay");
+  const chatContainer = document.getElementById("chat");
+  const introBtn = document.getElementById("startBtn");
+
+  // mostra overlay inicial
+  overlay.classList.remove("hidden");
+  overlay.classList.add("visible");
+
+  introBtn.addEventListener("click", () => {
+    // inicia o fade-out do overlay
+    overlay.style.transition = "opacity 3s ease";
+    overlay.style.opacity = 0;
+
+    // só depois de 3s (tempo do fade) é que toca o áudio
+    setTimeout(() => {
+      const audio = new Audio("/media/didIDreamWholeThing.mp3");
+      audio.volume = 0.6;
+      try {
+        audio.play();
+      } catch (err) {
+        console.warn("Audio blocked:", err);
+      }
+
+      audio.addEventListener("ended", () => {
+        overlay.remove();
+        chatContainer.classList.remove("hidden");
+        chatContainer.style.opacity = 0;
+        chatContainer.style.transition = "opacity 2s ease";
+
+        setTimeout(() => {
+          chatContainer.style.opacity = 1;
+          setTimeout(showMessage, 1000);
+        }, 50);
+      });
+    }, 3000); // espera o tempo do fade-out antes de tocar
+  });
 });

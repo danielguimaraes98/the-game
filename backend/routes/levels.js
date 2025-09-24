@@ -8,11 +8,13 @@ import { User } from "../models/User.js";
 
 export const levelsRouter = express.Router();
 
-// Resolve __dirname (em ES modules)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ---------------- GET: servir ficheiro do nível ----------------
+/**
+ * GET /levels/:level
+ * → Serve HTML for the requested level
+ */
 levelsRouter.get("/:level", requireAuth, async (req, res) => {
   const requested = parseInt(req.params.level, 10);
   const user = await User.findById(req.user.id);
@@ -28,13 +30,14 @@ levelsRouter.get("/:level", requireAuth, async (req, res) => {
     `level${requested}.html`
   );
 
-    // impede que o browser guarde em cache páginas de níveis
   res.set("Cache-Control", "no-store");
-
   res.sendFile(filePath);
 });
 
-// ---------------- POST: validar código e avançar ----------------
+/**
+ * POST /levels/:level/submit
+ * → Validate code and unlock next level
+ */
 levelsRouter.post("/:level/submit", requireAuth, async (req, res) => {
   const level = parseInt(req.params.level, 10);
   const { code } = req.body || {};
@@ -47,7 +50,6 @@ levelsRouter.post("/:level/submit", requireAuth, async (req, res) => {
     return res.status(400).json({ ok: false, message: "Wrong code" });
   }
 
-  // avançar progresso
   const user = await User.findById(req.user.id);
   if (level >= user.level) {
     await User.updateLevel(req.user.id, level + 1);
