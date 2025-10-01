@@ -1,3 +1,4 @@
+// JavaScript for Level 1
 import { requireAuth } from "../../js/authGuard.js";
 
 const chat = document.getElementById("chat");
@@ -151,8 +152,9 @@ function showMessage() {
             });
 
             const data = await res.json();
+            
             if (res.ok && data.ok) {
-              window.location.href = `../level${data.next}/level${data.next}.html`;
+              window.location.href = `../levels/level${data.next}/level${data.next}.html`;
             } else {
               const errorMsg = document.getElementById("error-msg");
               errorMsg.textContent = "Not the beginning I remember.";

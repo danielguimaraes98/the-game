@@ -1,0 +1,227 @@
+body {
+  margin: 0;
+  background: black;
+  height: 100vh;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: white;
+  overflow: hidden;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Overlay inicial */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 2s ease;
+  z-index: 10;
+}
+.overlay.visible {
+  opacity: 1;
+}
+.intro-text {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  max-width: 600px;
+  line-height: 1.4;
+  font-family: "RocknRoll One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+#startBtn {
+  margin-top: 10px;
+  padding: 8px 18px;
+  border: 1px solid #ffffff;
+  border-radius: 6px;
+  background: rgba(102,204,255,0.1);
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: "RocknRoll One", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+
+}
+#startBtn:hover {
+  background: #be901f;
+  color: #ffffff;
+}
+
+/* Vídeo central com proporção 16:9 */
+#video-container {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+#video-container.visible {
+  opacity: 1;
+}
+
+.video-wrapper {
+  position: relative;
+  width: min(90vw, 1400px);
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(255,255,255,0.3);
+}
+
+#memory-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Escurecimento final */
+#dark-overlay {
+  position: absolute;
+  inset: 0;
+  background: black;
+  opacity: 0;
+  transition: opacity 2s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+#dark-overlay.visible {
+  opacity: 0.5; /* escurece mas não fica preto total */
+}
+
+/* Container do input */
+#code-input {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  z-index: 3;
+}
+
+/* Caixa translúcida estilo anime */
+#code-box {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  padding: 20px 25px;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 0 20px rgba(255,255,255,0.1);
+  
+}
+
+/* Hint */
+#code-box .hint {
+  font-family: "RocknRoll One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  margin-bottom: 15px;
+  color: #ccc;
+  letter-spacing: 0.5px;
+}
+
+/* Input */
+#code-box input {
+  background: rgba(20,20,20,0.9);
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  padding: 8px 12px;
+  color: #fff;
+  outline: none;
+  text-align: center;
+  width: 100%;
+  font-family: "RocknRoll One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+#code-box input:focus {
+  border-color: #be901f;
+  box-shadow: 0 0 10px rgba(102,204,255,0.4);
+}
+
+/* Botão Unlock */
+#submit-code {
+  margin-top: 20px;
+  padding: 8px 18px;
+  border: 1px solid #ffffff;
+  border-radius: 6px;
+  background: rgba(102,204,255,0.1);
+  color: #ffffff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: "RocknRoll One", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+#submit-code:hover {
+  background: #be901f;
+  color: #ffffff;
+}
+
+/* Mensagem de erro */
+.error {
+  color: #ff6666;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Animação shake */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: shake 0.4s ease;
+}
+
+/* Botão Replay discreto no canto esquerdo */
+#replay-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 50%;
+  backdrop-filter: blur(6px);
+  transition: background 0.3s, transform 0.2s;
+}
+#replay-btn:hover {
+  background: rgba(255,255,255,0.7);
+  color: #000;
+  transform: scale(1.1);
+}
+
+
+

@@ -32,3 +32,6 @@ CREATE TABLE IF NOT EXISTS level_codes (
 // inserir código do Level 1 se ainda não existir
 await db.run("INSERT OR IGNORE INTO level_codes (level, code) VALUES (1, '2019')");
 
+// inserir código do Level 1 se ainda não existir
+await db.run("INSERT OR IGNORE INTO level_codes (level, code) VALUES (2, 'olhar')");
+

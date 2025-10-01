@@ -1,19 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h3>Hello from level 2 😊"</h3>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Level 2 – The Look</title>
+    <link rel="stylesheet" href="/levels/level2/level2.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=RocknRoll+One&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Overlay inicial -->
+    <div id="intro-overlay" class="overlay visible">
+      <p class="intro-text">"The moment our eyes met, the world stopped."</p>
+      <button id="startBtn">Remember</button>
+    </div>
 
-    <!-- AuthGuard -->
-  <script type="module">
-    import { requireAuth } from "../../js/authGuard.js"; 
-    // ↑ Caminho ajustado: este ficheiro está em levels/level1/, por isso tem de subir 2 níveis até /frontend/js/
+    <!-- Vídeo numa caixa central -->
+    <div id="video-container" class="hidden">
+      <div class="video-wrapper">
+      <video id="memory-video" playsinline>
+        <source src="/media/TheLook.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
 
-    requireAuth(1); // validate access to Level 1
-  </script>
-</body>
+      <!-- Escurecimento final -->
+      <div id="dark-overlay" class="hidden"></div>
+      
+      <!-- Botão Replay -->
+    <button id="replay-btn" class="hidden">↺</button>
+    </div>
+    </div>
+
+    <!-- Input (aparece depois) -->
+    <div id="code-input" class="hidden">
+      <div id="code-box">
+        <p class="hint">When the city went silent, only this sound remained.</p>
+        <input type="text" id="code" placeholder="Count them..." />
+        <button id="submit-code">Unlock</button>
+        <p id="error-msg" class="error hidden"></p>
+      </div>
+    </div>
+
+    
+
+    <!-- Level-specific JS -->
+    <script type="module" src="/levels/level2/level2.js"></script>
+  </body>
 </html>
