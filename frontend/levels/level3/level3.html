@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Level 3 – The Coordinates</title>
+    <link rel="stylesheet" href="/levels/level3/level3.css" />
+  </head>
+  <body>
+    <main class="level3-container">
+  <section class="content-wrapper">
+    <div class="word-block" id="wordBlock">
+      <span class="wb-letter" id="wLetter">W</span>
+      <span id="wRest"></span>
+      <span class="wb-letter" id="bLetter">B</span>
+      <span id="bRest"></span>
+    </div>
+
+    <!-- Bloco que aparece no fim da animação -->
+    <section id="coords-block" class="hidden">
+      <p class="coordinates">40.2321426, -3.5939941</p>
+
+      <div class="input-box">
+        <input type="text" id="code" placeholder="Eh, pretty easy, ain’t it doc?" />
+        <button id="submit-code">Unlock</button>
+        <p id="errorMsg" class="error-msg hidden"></p>
+      </div>
+    </section>
+  </section>
+</main>
+
+
+
+    <!-- Level-specific JS -->
+    <script type="module" src="/levels/level3/level3.js"></script>
+  </body>
+</html>

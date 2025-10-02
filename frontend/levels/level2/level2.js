@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (res.ok && data.ok) {
         window.location.href = `../level${data.next}/level${data.next}.html`;
       } else {
-        errorMsg.textContent = "That doesn’t sound right...";
+        errorMsg.textContent = data.message=="Wrong code" ? "That doesn’t sound right..." : data.message;
         errorMsg.classList.remove("hidden");
         errorMsg.classList.add("shake");
         setTimeout(() => errorMsg.classList.remove("shake"), 500);

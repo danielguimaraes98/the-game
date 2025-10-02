@@ -157,7 +157,7 @@ function showMessage() {
               window.location.href = `../levels/level${data.next}/level${data.next}.html`;
             } else {
               const errorMsg = document.getElementById("error-msg");
-              errorMsg.textContent = "Not the beginning I remember.";
+              errorMsg.textContent = data.message=="Wrong code" ? "Not the beginning I remember." : data.message;
               errorMsg.classList.remove("hidden");
             }
           } catch (err) {
