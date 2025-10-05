@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Level 4 – What Did I Hear?</title>
+    <link rel="stylesheet" href="/levels/level4/level4.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lobster&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+
+    <div id="startOverlay" class="start-overlay">
+      <p>Are you into this level?</p>
+    </div>
+
+    <main class="lyrics-container">
+      <section class="lyrics-stage" id="lyricsStage">
+        <!-- Os versos vão ser criados via JS -->
+      </section>
+
+      <div class="album-frame hidden" id="albumFrame">
+  <div class="frame-inner frosted">
+    <section class="input-section hidden" id="inputSection">
+      <input
+        id="code"
+        type="text"
+        class="unlock-input"
+        placeholder="Did you notice?"
+        autocomplete="off"
+      />
+    </section>
+  </div>
+
+  <div class="frame-footer" id="frameFooter">
+    <button id="submit-code" class="unlock-btn">UNLOCK</button>
+    <div id="errorMsg" class="error-msg hidden"></div>
+  </div>
+</div>
+
+
+    </main>
+
+    <!-- Música -->
+    <audio id="song" src="/media/Into You.mp3"></audio>
+
+    <!-- Level-specific JS -->
+    <script type="module" src="/levels/level4/level4.js"></script>
+
+  </body>
+</html>

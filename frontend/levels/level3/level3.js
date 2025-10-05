@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const data = await res.json();
 
       if (res.ok && data.ok) {
-        window.location.href = `../level${data.next}/level${data.next}.html`;
+        window.location.href = `../levels/${data.next}/level${data.next}.html`;
       } else {
         errorMsg.textContent = data.message=="Wrong code" ? "Th-th-that’s WRONG!" : data.message;
         errorMsg.classList.remove("hidden");
