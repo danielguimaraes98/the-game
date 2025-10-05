@@ -34,4 +34,5 @@ await db.run("INSERT OR IGNORE INTO level_codes (level, code) VALUES (1, '2019')
 await db.run("INSERT OR IGNORE INTO level_codes (level, code) VALUES (2, '42')");
 await db.run("INSERT OR IGNORE INTO level_codes (level, code) VALUES (3, 'Warner Bros')");
 await db.run("INSERT OR IGNORE INTO level_codes (level, code) VALUES (4, 'Oh, baby, look what you started')");
+await db.run("INSERT OR IGNORE INTO level_codes (level, code) VALUES (5, 'ThoseEyes.mp3')");
 
